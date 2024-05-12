@@ -6,7 +6,7 @@
 #    By: nabil <nabil@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/13 16:08:48 by nabil             #+#    #+#              #
-#    Updated: 2024/05/09 17:33:16 by nabil            ###   ########.fr        #
+#    Updated: 2024/05/12 16:55:40 by nabil            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,41 +17,48 @@ NAME        = philo
 NAME_BONUS  = philo_bonus
 CC          = gcc
 CFLAGS      = -Wall -Wextra -Werror
-LIBFT_DIR   = libft
-LIBFT       = $(LIBFT_DIR)/libft.a
-INCLUDES    = -I$(LIBFT_DIR)
+INCLUDES    = -Isrc
 RM          = rm -rf
 
-SRC_PHILO       = src/philo.c
+SRC_PHILO       = src/main.c src/outils_lib.c src/verif.c src/if_six_arg.c
 SRC_PHILO_BONUS = src/philo_bonus.c
 
 OBJ_DIR     = obj
 OBJ_PHILO       = $(addprefix $(OBJ_DIR)/, $(SRC_PHILO:.c=.o))
 OBJ_PHILO_BONUS = $(addprefix $(OBJ_DIR)/, $(SRC_PHILO_BONUS:.c=.o))
 
+# COLORS
+CYAN        = \033[0;36m
+GREEN       = \033[0;32m
+END_COLOR   = \033[0m
+
 # **************************************************************************** #
 # RULES
 
-all: $(NAME) $(NAME_BONUS)
+all: $(NAME)
 
-$(NAME): $(OBJ_PHILO) $(LIBFT)
-	@$(CC) $(CFLAGS) $(OBJ_PHILO) $(LIBFT) -o $(NAME)
-	@echo "Compilation de $(NAME) réussie."
-
-$(NAME_BONUS): $(OBJ_PHILO_BONUS) $(LIBFT)
-	@$(CC) $(CFLAGS) $(OBJ_PHILO_BONUS) $(LIBFT) -o $(NAME_BONUS)
-	@echo "Compilation de $(NAME_BONUS) réussie."
+$(NAME): $(OBJ_PHILO)
+	@$(CC) $(CFLAGS) $(OBJ_PHILO) -o $(NAME)
+	@echo "$(GREEN)[Compilation]$(END_COLOR) $(NAME) compilé avec succès.                        "
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(LIBFT):
-	@make -C $(LIBFT_DIR)
+	@printf "$(GREEN)[Compilation]$(END_COLOR) Compilation de $(CYAN)$<$(END_COLOR)...\r"
 
 clean:
 	@$(RM) $(OBJ_DIR)
-	@make -C $(LIBFT_DIR) clean
+	@echo "$(GREEN)[Nettoyage]$(END_COLOR) Dossier des objets supprimé."
 
 fclean: clean
-	@$(RM) $(NAME) $(NAME_B)
+	@$(RM) $(NAME) $(NAME_BONUS)
+	@echo "$(GREEN)[Nettoyage]$(END_COLOR) Exécutable(s) supprimé(s)."
+
+re: fclean all
+
+bonus: $(NAME_BONUS)
+
+$(NAME_BONUS): $(OBJ_PHILO_BONUS)
+	@$(CC) $(CFLAGS) $(OBJ_PHILO_BONUS) -o $(NAME_BONUS)
+	@echo "$(GREEN)[Compilation]$(END_COLOR) $(NAME_BONUS) compilé avec succès."
+

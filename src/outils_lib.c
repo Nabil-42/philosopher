@@ -6,11 +6,11 @@
 /*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:58:11 by nabil             #+#    #+#             */
-/*   Updated: 2024/04/13 17:25:35 by nabil            ###   ########.fr       */
+/*   Updated: 2024/05/10 12:40:50 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <philo.h>
+# include "philo.h"
 
 long	ft_atoi(const char *str)
 {
