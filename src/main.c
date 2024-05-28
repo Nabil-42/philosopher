@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/05/25 13:26:31 by nabil            ###   ########.fr       */
+/*   Updated: 2024/05/28 13:13:46 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,22 +39,10 @@ void give_fork(t_para *pa, int index_p_s)
 	
 	if (pa->philo_status[index_p_s].true_id == 1)
 	{
-		while(pa->fork_status[index_p_s] == 1 ||
-			pa->fork_status[pa->nbr_philo - 1] == 1)
-				printf("if philo [%d] j'attend lui = %d avant lui = %d\n",pa->philo_status[index_p_s].true_id ,pa->fork_status[index_p_s], pa->fork_status[pa->nbr_philo - 1]);
-		// printf("philo [%d] lui = %d avant lui = %d\n", pa->philo_status[index_p_s].true_id,pa->fork_status[index_p_s], pa->fork_status[pa->nbr_philo - 1]);
-		pa->fork_status[index_p_s] = 1;
-		pa->fork_status[pa->nbr_philo - 1] = 1;
 		pthread_mutex_lock(&pa->forks[index_p_s]);
 		pthread_mutex_lock(&pa->forks[pa->nbr_philo - 1]);
 	}
 	else {
-		while(pa->fork_status[index_p_s] == 1 ||
-			pa->fork_status[index_p_s - 1] == 1)
-				printf("else philo [%d] j'attend lui = %d avant lui = %d\n",pa->philo_status[index_p_s].true_id ,pa->fork_status[index_p_s], pa->fork_status[index_p_s - 1]);
-		// printf("philo [%d] lui = %d avant lui = %d\n", pa->philo_status[index_p_s].true_id,pa->fork_status[index_p_s], pa->fork_status[index_p_s - 1]);
-		pa->fork_status[index_p_s] = 1;
-		pa->fork_status[index_p_s - 1] = 1;
 		pthread_mutex_lock(&pa->forks[index_p_s]);
 		pthread_mutex_lock(&pa->forks[index_p_s - 1]);
 	}
