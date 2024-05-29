@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/05/28 13:13:46 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/05/29 13:25:00 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ int	init(t_para *params, char **argv)
 	params->time_to_sleep = ft_atoi(argv[4]);
 	params->time_to_eat = ft_atoi(argv[3]);
 	params->time_to_die = ft_atoi(argv[2]);
-	params->even = 2;
-	params->odd = 1;
 	params->start_fonction = 0;
 	params->forks = malloc(ft_atoi(argv[1]) * sizeof(pthread_mutex_t));
 	if (params->forks == NULL)
@@ -115,6 +113,7 @@ int initialise(char **argv, t_para params)
 		params.prio_lock[params.i] = 0;
 		params.fork_status[params.i] = 0;
 		params.philo_status[params.i].true_id = params.i + 1;
+		usleep(200);
 		pthread_mutex_init(&params.forks[params.i], NULL);
 		params.i++;
 	}
@@ -122,7 +121,7 @@ int initialise(char **argv, t_para params)
 	while (params.i < ft_atoi(argv[1]) + 1)
 	{
 		pthread_create(&params.philosophers[params.i], NULL, philosopher_life, (void *)&params);
-		sleep(1);
+		sleep(200);
 		++params.i;
 	}
 	params.i = 0;
