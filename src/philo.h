@@ -6,7 +6,7 @@
 /*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/05/29 12:20:15 by nabil            ###   ########.fr       */
+/*   Updated: 2024/07/14 21:12:47 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ typedef struct s_philo
     struct timeval last_eat;
     int true_id;
     int finish;
+    long int time_to_sleep;
+    long int time_to_eat;
+    long int time_to_die; 
 }t_philo;
 
 typedef struct s_para 

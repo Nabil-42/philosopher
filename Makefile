@@ -6,7 +6,7 @@
 #    By: nabil <nabil@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/13 16:08:48 by nabil             #+#    #+#              #
-#    Updated: 2024/05/12 16:55:40 by nabil            ###   ########.fr        #
+#    Updated: 2024/07/14 12:07:00 by nabil            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@
 NAME        = philo
 NAME_BONUS  = philo_bonus
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror
+CFLAGS      = -Wall -Wextra -Werror -g -O0
 INCLUDES    = -Isrc
 RM          = rm -rf
 
