@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   if_six_arg.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 01:07:00 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/15 15:07:54 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/15 23:57:29 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,25 +60,37 @@ void	*philosopher_life_bis(void *params)
 
 	pa = (t_para *)params;
 	i = 0;
-	pthread_mutex_lock(&pa->forks[0]);
+	pthread_mutex_lock(&pa->gate[0]);
 	index_p_s = pa->i;
-	pthread_mutex_unlock(&pa->forks[0]);
+	pthread_mutex_unlock(&pa->gate[0]);
 
 	if (index_p_s == pa->nbr_philo)
 		return (check_philo_bis(pa), NULL);
 	usleep(10000 - 100 * index_p_s);
 	while (i < pa->must_eat)
 	{
+		pthread_mutex_lock(&pa->gate[1]);
 		printf("%ldm.s Philosophe %d is thinking...\n", GT(pa),pa->philo_status[index_p_s].true_id);
+		pthread_mutex_unlock(&pa->gate[1]);
 		usleep(1000);
 		give_fork(pa, index_p_s);
-		printf("%ldm.s Philosophe %d has taken a fork...\n", GT(pa),pa->philo_status[index_p_s].true_id);
+		pthread_mutex_lock(&pa->gate[1]);
+			printf("%ldm.s Philosophe %d has taken a fork...\n", GT(pa),pa->philo_status[index_p_s].true_id);
+		pthread_mutex_unlock(&pa->gate[1]);
+		pthread_mutex_lock(&pa->gate[1]);
 		printf("%ldm.s Philosophe %d is eating...\n", GT(pa),pa->philo_status[index_p_s].true_id);
+		pthread_mutex_unlock(&pa->gate[1]);
 		usleep(pa->philo_status[index_p_s].time_to_eat * 1000);
+
+		pthread_mutex_lock(&pa->gate[1]);
 		printf("		philo [%d] last eat = %ld\n", index_p_s + 1, GT(pa));
+		pthread_mutex_unlock(&pa->gate[1]);
 		gettimeofday(&pa->philo_status[index_p_s].last_eat, NULL);
 		give_back_fork(pa, index_p_s);
+
+		pthread_mutex_lock(&pa->gate[1]);
 		printf("%ldm.s Philosophe %d is sleeping...\n", GT(pa),pa->philo_status[index_p_s].true_id);
+		pthread_mutex_unlock(&pa->gate[1]);
 		usleep(pa->philo_status[index_p_s].time_to_sleep * 1000);
 		++i;
 	}
@@ -105,6 +117,7 @@ int	initialise_bis(char **argv, t_para params)
 	{
 		mini_init_bis(&params, argv);
 		pthread_mutex_init(&params.forks[params.i], NULL);
+		pthread_mutex_init(&params.gate[params.i], NULL);
 		usleep(1000);
 		params.i++;
 	}
@@ -115,9 +128,9 @@ int	initialise_bis(char **argv, t_para params)
 				philosopher_life_bis, (void *)&params) != 0)
 			return (printf("Error: pthread creat !"));
 		usleep(1000);
-		pthread_mutex_lock(&params.forks[0]);
+		pthread_mutex_lock(&params.gate[0]);
 		++params.i;
-		pthread_mutex_unlock(&params.forks[0]);
+		pthread_mutex_unlock(&params.gate[0]);
 	}
 	params.i = 0;
 	while (params.i < ft_atoi(argv[1]))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/15 13:54:22 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/15 22:55:09 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_para
     pthread_mutex_t *forks;
     t_philo *philo_status;
     pthread_t *philosophers;
+    pthread_mutex_t *gate;
     int *fork_status;
     int must_eat;
 	int nbr_philo;

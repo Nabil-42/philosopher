@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/15 14:41:18 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/15 23:10:35 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,12 @@ int	init(t_para *params, char **argv)
 	params->nbr_philo = ft_atoi(argv[1]);
 
 	params->start_fonction = 0;
-	params->forks = malloc((ft_atoi(argv[1]) + 3) * sizeof(pthread_mutex_t));
+	params->forks = malloc((ft_atoi(argv[1])) * sizeof(pthread_mutex_t));
 	if (params->forks == NULL)
 		return (printf("Error: Malloc forks\n"));
+	params->gate = malloc((ft_atoi(argv[1])) * sizeof(pthread_mutex_t));
+	if (params->gate == NULL)
+		return (printf("Error: Malloc gate\n"));
 	params->philo_status = malloc(ft_atoi(argv[1]) * sizeof(t_philo));
 	if (params->philo_status == NULL)
 		return (printf("Error: Malloc philo_status\n"));
@@ -111,13 +114,13 @@ void *philosopher_life(void *params)
 
 int initialise(char **argv, t_para params)
 {	
-	
 	init(&params, argv);
 	params.i = 0;
 	while (params.i < ft_atoi(argv[1]))
 	{
 		mini_init_bis(&params, argv);
 		pthread_mutex_init(&params.forks[params.i], NULL);
+		pthread_mutex_init(&params.gate[params.i], NULL);
 		usleep(1000);
 		params.i++;
 	}
@@ -128,9 +131,9 @@ int initialise(char **argv, t_para params)
 				philosopher_life, (void *)&params) != 0)
 			return (printf("Error: pthread creat !"));
 		usleep(1000);
-		pthread_mutex_lock(&params.forks[0]);
+		pthread_mutex_lock(&params.gate[0]);
 		++params.i;
-		pthread_mutex_unlock(&params.forks[0]);
+		pthread_mutex_unlock(&params.gate[0]);
 	}
 	params.i = 0;
 	while (params.i < ft_atoi(argv[1]))
