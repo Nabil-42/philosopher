@@ -3,20 +3,20 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nabil <nabil@student.42.fr>                +#+  +:+       +#+         #
+#    By: nabboud <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/13 16:08:48 by nabil             #+#    #+#              #
-#    Updated: 2024/07/14 12:07:00 by nabil            ###   ########.fr        #
+#    Updated: 2024/07/15 14:53:52 by nabboud          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # **************************************************************************** #
 # VARIABLES
-
+-fsanitize=thread
 NAME        = philo
 NAME_BONUS  = philo_bonus
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -g -O0
+CFLAGS      = -Wall -Wextra -Werror -g -O0 -fsanitize=thread
 INCLUDES    = -Isrc
 RM          = rm -rf
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/14 21:12:47 by nabil            ###   ########.fr       */
+/*   Updated: 2024/07/15 13:54:22 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct s_philo
     int finish;
     long int time_to_sleep;
     long int time_to_eat;
-    long int time_to_die; 
+    long int time_to_die;
 }t_philo;
 
 typedef struct s_para 
@@ -42,14 +42,8 @@ typedef struct s_para
     t_philo *philo_status;
     pthread_t *philosophers;
     int *fork_status;
-    int *prio_lock;
-    long int time_to_sleep;
-    long int time_to_eat;
-    long int time_to_die;
     int must_eat;
-    int nbr_philo;
-    int even;
-    int odd;
+	int nbr_philo;
     int i;
     int start_fonction;
     struct timeval start;
@@ -62,5 +56,7 @@ int	init(t_para *params, char **argv);
 int verif_atoi(char **argv);
 int verif_numbers(char **argv);
 long	ft_atoi(const char *str);
-
+void	check_philo_bis(t_para *pa);
+long	GT(t_para *pa);
+void	mini_init_bis(t_para *params, char **argv);
 #endif
