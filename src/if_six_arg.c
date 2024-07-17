@@ -6,7 +6,7 @@
 /*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 01:07:00 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/17 16:33:57 by nabil            ###   ########.fr       */
+/*   Updated: 2024/07/17 16:52:37 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	*check_philo_bis(void *params)
 	{
 		gettimeofday(&now, NULL);
 		usleep(500);
-
+		pthread_mutex_lock(&pa->gate[4]);
 		if (i > pa->nbr_philo - 1)
 			i = 0;
 		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
@@ -50,6 +50,7 @@ void	*check_philo_bis(void *params)
 				pa->philo_status[i].time_to_die);
 			exit(1);
 		}
+		pthread_mutex_unlock(&pa->gate[4]);
 		++i;
 	}
 	exit(1);
@@ -84,7 +85,6 @@ void	*philosopher_life_bis(void *params)
 		pthread_mutex_lock(&pa->gate[3]);
 		printf("%ldm.s Philosophe %d is eating...\n", GT(pa),pa->philo_status[index_p_s].true_id);
 		pthread_mutex_unlock(&pa->gate[3]);
-				printf("	BEFOR USLEEP	philo [%d] last eat = %ld\n", index_p_s + 1, GT(pa));
 		usleep(pa->philo_status[index_p_s].time_to_eat * 1000);
 
 		pthread_mutex_lock(&pa->gate[4]);
@@ -161,10 +161,10 @@ int	initialise_bis(char **argv, t_para *params)
 		++params->i;
 		pthread_mutex_unlock(&params->gate[0]);
 	}
+	gettimeofday(&params->start, NULL);
 	if (pthread_create(&params->philosophers[params->i], NULL,
 			check_philo_bis, (void *)params))
 		return (printf("Error: pthread creat !"));
-	gettimeofday(&params->start, NULL);
 	pthread_mutex_unlock(&params->gate[7]);
 	params->i = 0;
 	while (params->i < ft_atoi(argv[1]))
