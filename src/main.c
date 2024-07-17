@@ -6,7 +6,7 @@
 /*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/15 23:10:35 by nabil            ###   ########.fr       */
+/*   Updated: 2024/07/17 16:30:22 by nabil            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,24 @@ void give_back_fork(t_para *pa, int index_p_s)
 {
 	if (pa->philo_status[index_p_s].true_id == 1)
 	{
-		pa->fork_status[index_p_s] = 0;
-		pthread_mutex_unlock(&pa->forks[index_p_s]);
 		pa->fork_status[pa->nbr_philo - 1] = 0;
 		pthread_mutex_unlock(&pa->forks[pa->nbr_philo - 1]);
+		pa->fork_status[index_p_s] = 0;
+		pthread_mutex_unlock(&pa->forks[index_p_s]);
 	}
-	else {
+	else if (pa->philo_status[index_p_s].true_id % 2 == 1)
+	{
 		pa->fork_status[index_p_s - 1] = 0;
 		pthread_mutex_unlock(&pa->forks[index_p_s - 1]);
 		pa->fork_status[index_p_s] = 0;
 		pthread_mutex_unlock(&pa->forks[index_p_s]);
+	}
+	else if (pa->philo_status[index_p_s].true_id % 2 == 0)
+	{
+		pa->fork_status[index_p_s] = 0;
+		pthread_mutex_unlock(&pa->forks[index_p_s]);
+		pa->fork_status[index_p_s - 1] = 0;
+		pthread_mutex_unlock(&pa->forks[index_p_s - 1]);
 	}
 }
 
@@ -35,15 +43,23 @@ void give_fork(t_para *pa, int index_p_s)
 	
 	if (pa->philo_status[index_p_s].true_id == 1)
 	{
-		pthread_mutex_lock(&pa->forks[index_p_s]);
-		pa->fork_status[index_p_s] = 1;
 		pthread_mutex_lock(&pa->forks[pa->nbr_philo - 1]);
 		pa->fork_status[pa->nbr_philo - 1] = 1;
+		pthread_mutex_lock(&pa->forks[index_p_s]);
+		pa->fork_status[index_p_s] = 1;
 	}
-	else {
+	else if (pa->philo_status[index_p_s].true_id % 2 == 1)
+	{
 		pthread_mutex_lock(&pa->forks[index_p_s - 1]);
 		pa->fork_status[index_p_s - 1] = 1;
 		pthread_mutex_lock(&pa->forks[index_p_s]);
+		pa->fork_status[index_p_s] = 1;
+	}
+	else if (pa->philo_status[index_p_s].true_id % 2 == 0)
+	{
+		pthread_mutex_lock(&pa->forks[index_p_s]);
+		pa->fork_status[index_p_s - 1] = 1;
+		pthread_mutex_lock(&pa->forks[index_p_s - 1]);
 		pa->fork_status[index_p_s] = 1;
 	}
 }
@@ -51,21 +67,21 @@ void give_fork(t_para *pa, int index_p_s)
 int	init(t_para *params, char **argv)
 {
 	params->nbr_philo = ft_atoi(argv[1]);
-
+	params->time_to_die = ft_atoi(argv[2]);
 	params->start_fonction = 0;
-	params->forks = malloc((ft_atoi(argv[1])) * sizeof(pthread_mutex_t));
+	params->forks = malloc(params->nbr_philo * sizeof(pthread_mutex_t));
 	if (params->forks == NULL)
 		return (printf("Error: Malloc forks\n"));
-	params->gate = malloc((ft_atoi(argv[1])) * sizeof(pthread_mutex_t));
+	params->gate = malloc(10 * sizeof(pthread_mutex_t));
 	if (params->gate == NULL)
 		return (printf("Error: Malloc gate\n"));
-	params->philo_status = malloc(ft_atoi(argv[1]) * sizeof(t_philo));
+	params->philo_status = malloc(params->nbr_philo * sizeof(t_philo));
 	if (params->philo_status == NULL)
 		return (printf("Error: Malloc philo_status\n"));
-	params->philosophers = malloc((ft_atoi(argv[1]) + 1) * sizeof(pthread_t));
+	params->philosophers = malloc((params->nbr_philo + 1)* sizeof(pthread_t));
 	if (params->philosophers == NULL)
 		return (printf("Error: Malloc philosophers\n"));
-	params->fork_status = malloc(ft_atoi(argv[1]) * sizeof(int));
+	params->fork_status = malloc(params->nbr_philo * sizeof(int));
 	if (params->fork_status == NULL)
 		return (printf("Error: Malloc fork_status\n"));
 	if (argv[5] != NULL)
@@ -112,47 +128,46 @@ void *philosopher_life(void *params)
 }
 
 
-int initialise(char **argv, t_para params)
+int initialise(char **argv, t_para *params)
 {	
-	init(&params, argv);
-	params.i = 0;
-	while (params.i < ft_atoi(argv[1]))
+	init(params, argv);
+	params->i = 0;
+	while (params->i < ft_atoi(argv[1]))
 	{
-		mini_init_bis(&params, argv);
-		pthread_mutex_init(&params.forks[params.i], NULL);
-		pthread_mutex_init(&params.gate[params.i], NULL);
+		mini_init_bis(params, argv);
+		pthread_mutex_init(&params->forks[params->i], NULL);
+		pthread_mutex_init(&params->gate[params->i], NULL);
 		usleep(1000);
-		params.i++;
+		params->i++;
 	}
-	params.i = 0;
-	while (params.i < ft_atoi(argv[1]) + 1)
+	params->i = 0;
+	while (params->i < ft_atoi(argv[1]) + 1)
 	{
-		if (pthread_create(&params.philosophers[params.i], NULL,
-				philosopher_life, (void *)&params) != 0)
+		if (pthread_create(&params->philosophers[params->i], NULL,
+				philosopher_life, (void *)params) != 0)
 			return (printf("Error: pthread creat !"));
 		usleep(1000);
-		pthread_mutex_lock(&params.gate[0]);
-		++params.i;
-		pthread_mutex_unlock(&params.gate[0]);
+		pthread_mutex_lock(&params->gate[0]);
+		++params->i;
+		pthread_mutex_unlock(&params->gate[0]);
 	}
-	params.i = 0;
-	while (params.i < ft_atoi(argv[1]))
-		(pthread_join(params.philosophers[params.i], NULL), ++params.i);
-	params.i = 0;
-	while (params.i < ft_atoi(argv[1]))
-		(pthread_mutex_destroy(&params.forks[params.i]), ++params.i);
+	params->i = 0;
+	while (params->i < ft_atoi(argv[1]))
+		(pthread_join(params->philosophers[params->i], NULL), ++params->i);
+	params->i = 0;
+	while (params->i < ft_atoi(argv[1]))
+		(pthread_mutex_destroy(&params->forks[params->i]), ++params->i);
 	return (0);
 }
 int main (int argc, char **argv)
 {
 	t_para params;
 	
-	gettimeofday(&params.start, NULL);
 	if (argc < 5 || argc > 6)
 		return (printf("Erreur: Nombre d'argument\n"));
 	if (verif_numbers(argv) || verif_atoi(argv))
 		return (printf("Erreur: Argument non INT\n"));
 	if (argc == 5)
-		initialise(argv, params);
-	else (initialise_bis(argv, params));
+		initialise(argv, &params);
+	else (initialise_bis(argv, &params));
 }
