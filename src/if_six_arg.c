@@ -3,24 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   if_six_arg.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nabil <nabil@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 01:07:00 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/17 16:52:37 by nabil            ###   ########.fr       */
+/*   Updated: 2024/07/18 17:14:32 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
 
-long	GT(t_para *pa)
-{
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	return (((time.tv_sec * 1000) + (time.tv_usec / 1000)) - ((pa->start.tv_sec
-				* 1000) + (pa->start.tv_usec / 1000)));
-}
 
 void	*check_philo_bis(void *params)
 {
@@ -30,12 +22,19 @@ void	*check_philo_bis(void *params)
 
 	pa = (t_para *)params;
 	i = 0;
-	usleep((1000 * (pa->nbr_philo / 2)) + (pa->time_to_die * 1000));
+	pthread_mutex_lock(&pa->gate[6]);
+	pa->is_dead = 0;
+	pthread_mutex_unlock(&pa->gate[6]);
+	pthread_mutex_lock(&pa->gate[7]);
+	pthread_mutex_unlock(&pa->gate[7]);
+	while (i < pa->nbr_philo)
+		gettimeofday(&pa->philo_status[i].last_eat, NULL), ++i;
+	usleep((1000 * (pa->nbr_philo)) + (pa->time_to_die * 1000));
 	while (1)
 	{
-		gettimeofday(&now, NULL);
 		usleep(500);
-		pthread_mutex_lock(&pa->gate[4]);
+		pthread_mutex_lock(&pa->gate[1]);
+		gettimeofday(&now, NULL);
 		if (i > pa->nbr_philo - 1)
 			i = 0;
 		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
@@ -48,72 +47,82 @@ void	*check_philo_bis(void *params)
 				- ((pa->philo_status[i].last_eat.tv_sec * 1000)
 					+ (pa->philo_status[i].last_eat.tv_usec / 1000)),
 				pa->philo_status[i].time_to_die);
-			exit(1);
+			pthread_mutex_lock(&pa->gate[6]);
+			pa->is_dead = 1;
+			pthread_mutex_unlock(&pa->gate[6]);
+			pthread_mutex_unlock(&pa->gate[1]);
+			return (NULL);
 		}
-		pthread_mutex_unlock(&pa->gate[4]);
+		pthread_mutex_unlock(&pa->gate[1]);
 		++i;
 	}
-	exit(1);
 }
 
+int check_died_bis(t_para *pa, int index_p_s)
+{
+	
+	pthread_mutex_lock(&pa->gate[6]);
+	if (pa->is_dead == 1)
+	{
+		if (pa->philo_status[index_p_s].true_id == 1)
+	{
+		pthread_mutex_unlock(&pa->forks[pa->nbr_philo - 1]);
+	}
+	else (pthread_mutex_unlock(&pa->forks[index_p_s - 1]));
+	pthread_mutex_unlock(&pa->forks[index_p_s]);
+		pthread_mutex_unlock(&pa->gate[6]);
+		return (1);
+	}
+	pthread_mutex_unlock(&pa->gate[6]);
+	return(0);
+}
+int check_died(t_para *pa, int index_p_s)
+{
+	(void)index_p_s;
+	pthread_mutex_lock(&pa->gate[6]);
+	if (pa->is_dead == 1)
+	{
+		pthread_mutex_unlock(&pa->gate[6]);
+		return (1);
+	}
+	pthread_mutex_unlock(&pa->gate[6]);
+	return(0);
+}
 void	*philosopher_life_bis(void *params)
 {
 	t_para	*pa;
 	int		index_p_s;
 	int		i;
 
+	index_p_s = 0;
 	pa = (t_para *)params;
 	i = 0;
-	
-	pthread_mutex_lock(&pa->gate[0]);
-	index_p_s = pa->i;
-	pthread_mutex_unlock(&pa->gate[0]);
-	
-	pthread_mutex_lock(&pa->gate[7]);
-	pthread_mutex_unlock(&pa->gate[7]);
-	
+	init_thread(pa, &index_p_s);
 	while (i < pa->must_eat)
 	{
-		pthread_mutex_lock(&pa->gate[1]);
-		printf("%ldm.s Philosophe %d is thinking...\n", GT(pa),pa->philo_status[index_p_s].true_id);
-		pthread_mutex_unlock(&pa->gate[1]);
-		usleep(500);
+		think(pa, index_p_s);
+		if(check_died(pa, index_p_s))
+			return (NULL);
 		give_fork(pa, index_p_s);
-		pthread_mutex_lock(&pa->gate[2]);
-			printf("%ldm.s Philosophe %d has taken a fork...\n", GT(pa),pa->philo_status[index_p_s].true_id);
-		pthread_mutex_unlock(&pa->gate[2]);
-		pthread_mutex_lock(&pa->gate[3]);
-		printf("%ldm.s Philosophe %d is eating...\n", GT(pa),pa->philo_status[index_p_s].true_id);
-		pthread_mutex_unlock(&pa->gate[3]);
+		if(check_died_bis(pa, index_p_s))
+			return (NULL);
+		take_fork(pa, index_p_s);
 		usleep(pa->philo_status[index_p_s].time_to_eat * 1000);
-
-		pthread_mutex_lock(&pa->gate[4]);
-		gettimeofday(&pa->philo_status[index_p_s].last_eat, NULL);
-		printf("		philo [%d] last eat = %ld\n", index_p_s + 1, GT(pa));
-		pthread_mutex_unlock(&pa->gate[4]);
-		
+		if(check_died_bis(pa, index_p_s))
+			return (NULL);
+		last_eat(pa, index_p_s);
 		give_back_fork(pa, index_p_s);
-
-		pthread_mutex_lock(&pa->gate[5]);
-		printf("%ldm.s Philosophe %d is sleeping...\n", GT(pa),pa->philo_status[index_p_s].true_id);
-		pthread_mutex_unlock(&pa->gate[5]);
-		usleep(pa->philo_status[index_p_s].time_to_sleep * 1000);
+		if(check_died(pa, index_p_s))
+			return (NULL);
+		sleeping(pa, index_p_s);
+		if(check_died(pa, index_p_s))
+			return (NULL);
 		++i;
 	}
-	pa->philo_status[index_p_s].finish = 1;
-	printf("%ldm.s FINISHHHHH THREQD [%d]\n", GT(pa),
-		pa->philo_status[index_p_s].true_id);
+
 	return (NULL);
 }
-void	mini_init_bis(t_para *params, char **argv)
-{
-	params->philo_status[params->i].time_to_sleep = ft_atoi(argv[4]);
-	params->philo_status[params->i].time_to_eat = ft_atoi(argv[3]);
-	params->philo_status[params->i].time_to_die = ft_atoi(argv[2]);
-	params->fork_status[params->i] = 0;
-	params->philo_status[params->i].finish = 0;
-	params->philo_status[params->i].true_id = params->i + 1;
-}
+
 
 int init_mutex(t_para *params, char **argv)
 {
@@ -134,15 +143,7 @@ int init_mutex(t_para *params, char **argv)
 	}
 	return (0);
 }
-void destroy_mutex(t_para *params, char **argv)
-{
-	params->i = 0;
-	while (params->i < ft_atoi(argv[1]))
-		(pthread_mutex_destroy(&params->forks[params->i]), ++params->i);
-	params->i = 0;
-	while (params->i < 10)
-		(pthread_mutex_destroy(&params->gate[params->i]), ++params->i);
-}
+
 
 int	initialise_bis(char **argv, t_para *params)
 {
@@ -167,8 +168,9 @@ int	initialise_bis(char **argv, t_para *params)
 		return (printf("Error: pthread creat !"));
 	pthread_mutex_unlock(&params->gate[7]);
 	params->i = 0;
-	while (params->i < ft_atoi(argv[1]))
+	while (params->i < ft_atoi(argv[1]) + 1)
 		(pthread_join(params->philosophers[params->i], NULL), ++params->i);
-	destroy_mutex(params, argv);
+	destroy_mutex(params, params->nbr_philo);
+	free_all(params);
 	return (0);
 }

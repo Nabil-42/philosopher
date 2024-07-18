@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nabil <nabil@student.42.fr>                +#+  +:+       +#+         #
+#    By: nabboud <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/13 16:08:48 by nabil             #+#    #+#              #
-#    Updated: 2024/07/16 18:56:05 by nabil            ###   ########.fr        #
+#    Updated: 2024/07/18 15:11:56 by nabboud          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ CFLAGS      = -Wall -Wextra -Werror -g -O0
 INCLUDES    = -Isrc
 RM          = rm -rf
 
-SRC_PHILO       = src/main.c src/outils_lib.c src/verif.c src/if_six_arg.c
+SRC_PHILO       = src/main.c src/outils_lib.c src/verif.c src/if_six_arg.c src/tools.c src/action.c
 SRC_PHILO_BONUS = src/philo_bonus.c
 
 OBJ_DIR     = obj
