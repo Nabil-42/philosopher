@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/12 01:07:00 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/18 17:14:32 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/20 17:16:22 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,68 +14,8 @@
 #include <unistd.h>
 
 
-void	*check_philo_bis(void *params)
-{
-	t_para	*pa;
-	int				i;
-	struct timeval	now;
 
-	pa = (t_para *)params;
-	i = 0;
-	pthread_mutex_lock(&pa->gate[6]);
-	pa->is_dead = 0;
-	pthread_mutex_unlock(&pa->gate[6]);
-	pthread_mutex_lock(&pa->gate[7]);
-	pthread_mutex_unlock(&pa->gate[7]);
-	while (i < pa->nbr_philo)
-		gettimeofday(&pa->philo_status[i].last_eat, NULL), ++i;
-	usleep((1000 * (pa->nbr_philo)) + (pa->time_to_die * 1000));
-	while (1)
-	{
-		usleep(500);
-		pthread_mutex_lock(&pa->gate[1]);
-		gettimeofday(&now, NULL);
-		if (i > pa->nbr_philo - 1)
-			i = 0;
-		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
-			- ((pa->philo_status[i].last_eat.tv_sec * 1000)
-				+ (pa->philo_status[i].last_eat.tv_usec
-					/ 1000)) > pa->philo_status[i].time_to_die)
-		{
-			printf("%ldm.s philosopher N°%d est mort de faim, il a mange le %ld et devait manger le %ld\n",
-			GT(pa), i + 1, ((now.tv_sec * 1000) + (now.tv_usec / 1000))
-				- ((pa->philo_status[i].last_eat.tv_sec * 1000)
-					+ (pa->philo_status[i].last_eat.tv_usec / 1000)),
-				pa->philo_status[i].time_to_die);
-			pthread_mutex_lock(&pa->gate[6]);
-			pa->is_dead = 1;
-			pthread_mutex_unlock(&pa->gate[6]);
-			pthread_mutex_unlock(&pa->gate[1]);
-			return (NULL);
-		}
-		pthread_mutex_unlock(&pa->gate[1]);
-		++i;
-	}
-}
 
-int check_died_bis(t_para *pa, int index_p_s)
-{
-	
-	pthread_mutex_lock(&pa->gate[6]);
-	if (pa->is_dead == 1)
-	{
-		if (pa->philo_status[index_p_s].true_id == 1)
-	{
-		pthread_mutex_unlock(&pa->forks[pa->nbr_philo - 1]);
-	}
-	else (pthread_mutex_unlock(&pa->forks[index_p_s - 1]));
-	pthread_mutex_unlock(&pa->forks[index_p_s]);
-		pthread_mutex_unlock(&pa->gate[6]);
-		return (1);
-	}
-	pthread_mutex_unlock(&pa->gate[6]);
-	return(0);
-}
 int check_died(t_para *pa, int index_p_s)
 {
 	(void)index_p_s;
@@ -93,10 +33,14 @@ void	*philosopher_life_bis(void *params)
 	t_para	*pa;
 	int		index_p_s;
 	int		i;
-
+	
 	index_p_s = 0;
 	pa = (t_para *)params;
 	i = 0;
+	pthread_mutex_lock(&pa->gate[1]);
+	if (pa->nbr_philo == 1)
+		return (one_philo_life(pa), NULL);
+	pthread_mutex_unlock(&pa->gate[1]);
 	init_thread(pa, &index_p_s);
 	while (i < pa->must_eat)
 	{
@@ -106,7 +50,7 @@ void	*philosopher_life_bis(void *params)
 		give_fork(pa, index_p_s);
 		if(check_died_bis(pa, index_p_s))
 			return (NULL);
-		take_fork(pa, index_p_s);
+		eating(pa, index_p_s);
 		usleep(pa->philo_status[index_p_s].time_to_eat * 1000);
 		if(check_died_bis(pa, index_p_s))
 			return (NULL);
@@ -119,7 +63,6 @@ void	*philosopher_life_bis(void *params)
 			return (NULL);
 		++i;
 	}
-
 	return (NULL);
 }
 
@@ -164,7 +107,7 @@ int	initialise_bis(char **argv, t_para *params)
 	}
 	gettimeofday(&params->start, NULL);
 	if (pthread_create(&params->philosophers[params->i], NULL,
-			check_philo_bis, (void *)params))
+			check_philo, (void *)params))
 		return (printf("Error: pthread creat !"));
 	pthread_mutex_unlock(&params->gate[7]);
 	params->i = 0;

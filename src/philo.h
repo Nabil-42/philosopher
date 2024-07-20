@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/18 17:00:23 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/20 17:32:26 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,14 @@ typedef struct s_para
     struct timeval start;
 }t_para;
 
+void take_fork_bis(t_para *pa, int index_p_s);
+void	give_fork_bis(t_para *pa, int index_p_s);
+void sleeping_bis(t_para *pa, int index_p_s);
+void eating_bis(t_para *pa, int index_p_s);
+void think_bis(t_para *pa, int index_p_s);
+void one_philo_life(t_para *pa);
+int check_one_philo(t_para *pa);
+void eating(t_para *pa, int index_p_s);
 int check_died_bis(t_para *pa, int index_p_s);
 int init_mutex(t_para *params, char **argv);
 int check_died(t_para *pa, int index_p_s);
@@ -67,7 +75,7 @@ int	init(t_para *params, char **argv);
 int verif_atoi(char **argv);
 int verif_numbers(char **argv);
 long	ft_atoi(const char *str);
-void	*check_philo_bis(void *params);
+void	*check_philo(void *params);
 long	GT(t_para *pa);
 void	mini_init_bis(t_para *params, char **argv);
 
