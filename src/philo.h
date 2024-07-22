@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/20 17:32:26 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/22 20:10:56 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ long	GT(t_para *pa);
 void	mini_init_bis(t_para *params, char **argv);
 
 void init_thread(t_para *pa, int *index_p_s);
-void think(t_para *pa, int index_p_s);
+void think(t_para *pa, int index_p_s, int all);
 void take_fork(t_para *pa, int index_p_s);
 void last_eat(t_para *pa, int index_p_s);
 void sleeping(t_para *pa, int index_p_s);

@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/20 17:25:07 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/22 20:19:10 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,18 @@ void *philosopher_life(void *params)
 	index_p_s = 0;
 	pa = (t_para *)params;
 	i = 0;
+	int all = (pa->philo_status[index_p_s].time_to_die - pa->philo_status[index_p_s].time_to_sleep - pa->philo_status[index_p_s].time_to_eat / 2);
+	if (all < 0)
+		all *= -1;
 	pthread_mutex_lock(&pa->gate[1]);
 	if (pa->nbr_philo == 1)
 		return (one_philo_life(pa), NULL);
 	pthread_mutex_unlock(&pa->gate[1]);
 	init_thread(pa, &index_p_s);
+	if (pa->philo_status[index_p_s].true_id % 2 == 0 && pa->nbr_philo % 2 == 0)
+		usleep(all);
 	while (1)
 	{
-		think(pa, index_p_s);
-		if(check_died(pa, index_p_s))
-			return (NULL);
 		give_fork(pa, index_p_s);
 		if(check_died_bis(pa, index_p_s))
 			return (NULL);
@@ -68,11 +70,10 @@ void *philosopher_life(void *params)
 		if(check_died_bis(pa, index_p_s))
 			return (NULL);
 		give_back_fork(pa, index_p_s);
-		if(check_died(pa, index_p_s))
-			return (NULL);
 		sleeping(pa, index_p_s);
 		if(check_died(pa, index_p_s))
 			return (NULL);
+		think(pa, index_p_s, all);
 		++i;
 	}
 	return (NULL);
@@ -81,7 +82,8 @@ void *philosopher_life(void *params)
 
 int initialise(char **argv, t_para *params)
 {	
-	init(params, argv);
+	if (init(params, argv))
+		return (1);
 	if (init_mutex(params, argv))
 		return (1);
 	params->i = 0;

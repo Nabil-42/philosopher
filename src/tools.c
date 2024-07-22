@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/20 17:19:19 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/22 18:34:54 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,5 +79,6 @@ int	init(t_para *params, char **argv)
 		return (printf("Error: Malloc fork_status\n"));
 	if (argv[5] != NULL)
 		params->must_eat = ft_atoi(argv[5]);
+	else (params->must_eat = 0);
 	return (0);
 }
