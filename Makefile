@@ -6,7 +6,7 @@
 #    By: nabboud <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/13 16:08:48 by nabil             #+#    #+#              #
-#    Updated: 2024/07/20 17:21:06 by nabboud          ###   ########.fr        #
+#    Updated: 2024/07/23 16:21:33 by nabboud          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ CFLAGS      = -Wall -Wextra -Werror -g -O0
 INCLUDES    = -Isrc
 RM          = rm -rf
 
-SRC_PHILO       = src/main.c src/monitoring.c src/outils_lib.c src/verif.c src/if_six_arg.c src/tools.c src/action.c src/action_bis.c
+SRC_PHILO       = src/main.c src/monitoring.c src/monitoring_2.c src/outils_lib.c src/verif.c src/if_six_arg.c src/tools.c src/action.c src/action_bis.c src/action_2.c
 SRC_PHILO_BONUS = src/philo_bonus.c
 
 OBJ_DIR     = obj

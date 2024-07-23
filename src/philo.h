@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:35:08 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/23 14:51:21 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/23 16:44:21 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,13 +76,14 @@ int					verif_atoi(char **argv);
 int					verif_numbers(char **argv);
 long				ft_atoi(const char *str);
 void				*check_philo(void *params);
-long				GT(t_para *pa);
+long				ge_ti(t_para *pa);
 void				mini_init_bis(t_para *params, char **argv);
 
-void				init_thread(t_para *pa, int *index_p_s);
+int					init_thread(t_para *pa, int *index_p_s);
 void				think(t_para *pa, int index_p_s);
 void				take_fork(t_para *pa, int index_p_s);
 void				last_eat(t_para *pa, int index_p_s);
 void				sleeping(t_para *pa, int index_p_s);
+int					check_philo_2(t_para *pa);
 
 #endif

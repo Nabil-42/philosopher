@@ -6,14 +6,14 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/23 14:50:23 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/23 16:44:50 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
 
-long	GT(t_para *pa)
+long	ge_ti(t_para *pa)
 {
 	struct timeval	time;
 

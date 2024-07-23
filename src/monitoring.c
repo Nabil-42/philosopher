@@ -6,91 +6,32 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 17:15:50 by nabboud           #+#    #+#             */
-/*   Updated: 2024/07/23 14:50:20 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/23 16:32:28 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
 
-int	check_one_philo(t_para *pa)
+int	condition(int i, t_para *pa, struct timeval now)
 {
-	struct timeval	now;
-	int				i;
-
-	i = 0;
-	gettimeofday(&pa->philo_status[0].last_eat, NULL);
-	usleep((1000 * (pa->nbr_philo)) + (pa->time_to_die * 1000));
-	while (1)
+	if (i > pa->nbr_philo - 1)
+		i = 0;
+	if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
+		- ((pa->philo_status[i].last_eat.tv_sec * 1000)
+			+ (pa->philo_status[i].last_eat.tv_usec
+				/ 1000)) > pa->philo_status[i].time_to_die)
 	{
 		pthread_mutex_lock(&pa->gate[1]);
-		gettimeofday(&now, NULL);
-		if (i > pa->nbr_philo - 1)
-			i = 0;
-		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
-			- ((pa->philo_status[i].last_eat.tv_sec * 1000)
-				+ (pa->philo_status[i].last_eat.tv_usec
-					/ 1000)) > pa->philo_status[i].time_to_die)
-		{
-			printf("%ld %d died\n", GT(pa), i + 1);
-			pthread_mutex_lock(&pa->gate[6]);
-			pa->is_dead = 1;
-			pthread_mutex_unlock(&pa->gate[6]);
-			pthread_mutex_unlock(&pa->gate[1]);
-			return (0);
-		}
+		printf("%ld %d died\n", ge_ti(pa), i + 1);
 		pthread_mutex_unlock(&pa->gate[1]);
-		++i;
-	}
-}
-
-void	*check_philo_bis(void *params)
-{
-	t_para			*pa;
-	struct timeval	now;
-	int				j;
-	int				i;
-	int				k;
-
-	pa = (t_para *)params;
-	j = 0;
-	i = 0;
-	k = 0;
-	while (j < pa->nbr_philo)
-		gettimeofday(&pa->philo_status[j].last_eat, NULL), ++j;
-	usleep((1000 * (pa->nbr_philo)) + (pa->time_to_die * 1000));
-	j = 0;
-	while (j < pa->nbr_philo - 1)
-	{
-		k = 0;
-		pthread_mutex_lock(&pa->gate[3]);
-		gettimeofday(&now, NULL);
-		pthread_mutex_lock(&pa->gate[4]);
-		while (k < pa->nbr_philo)
-		{
-			if (pa->philo_status[k].finish == 1)
-				++j;
-			++k;
-		}
-		pthread_mutex_unlock(&pa->gate[4]);
-		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
-			- ((pa->philo_status[i].last_eat.tv_sec * 1000)
-				+ (pa->philo_status[i].last_eat.tv_usec
-					/ 1000)) > pa->philo_status[i].time_to_die)
-		{
-			pthread_mutex_lock(&pa->gate[1]);
-			printf("%ld %d died\n", GT(pa), i + 1);
-			pthread_mutex_unlock(&pa->gate[1]);
-			pthread_mutex_lock(&pa->gate[6]);
-			pa->is_dead = 1;
-			pthread_mutex_unlock(&pa->gate[6]);
-			pthread_mutex_unlock(&pa->gate[3]);
-			return (NULL);
-		}
+		pthread_mutex_lock(&pa->gate[6]);
+		pa->is_dead = 1;
+		pthread_mutex_unlock(&pa->gate[6]);
 		pthread_mutex_unlock(&pa->gate[3]);
+		return (1);
 	}
-	pthread_mutex_unlock(&pa->gate[3]);
-	return (NULL);
+	return (0);
 }
 
 void	*check_philo(void *params)
@@ -101,38 +42,17 @@ void	*check_philo(void *params)
 
 	pa = (t_para *)params;
 	i = 0;
-	pthread_mutex_lock(&pa->gate[6]);
-	pa->is_dead = 0;
-	pthread_mutex_unlock(&pa->gate[6]);
-	pthread_mutex_lock(&pa->gate[7]);
-	pthread_mutex_unlock(&pa->gate[7]);
-	if (pa->nbr_philo == 1)
-		return (check_one_philo(pa), NULL);
-	if (pa->must_eat != 0)
-		return (check_philo_bis(pa), NULL);
+	if (check_philo_2(pa))
+		return (NULL);
 	while (i < pa->nbr_philo)
-		gettimeofday(&pa->philo_status[i].last_eat, NULL), ++i;
+		(gettimeofday(&pa->philo_status[i].last_eat, NULL), ++i);
 	usleep((1000 * (pa->nbr_philo)) + (pa->time_to_die * 1000));
 	while (1)
 	{
 		pthread_mutex_lock(&pa->gate[3]);
 		gettimeofday(&now, NULL);
-		if (i > pa->nbr_philo - 1)
-			i = 0;
-		if (((now.tv_sec * 1000) + (now.tv_usec / 1000))
-			- ((pa->philo_status[i].last_eat.tv_sec * 1000)
-				+ (pa->philo_status[i].last_eat.tv_usec
-					/ 1000)) > pa->philo_status[i].time_to_die)
-		{
-			pthread_mutex_lock(&pa->gate[1]);
-			printf("%ld %d died\n", GT(pa), i + 1);
-			pthread_mutex_unlock(&pa->gate[1]);
-			pthread_mutex_lock(&pa->gate[6]);
-			pa->is_dead = 1;
-			pthread_mutex_unlock(&pa->gate[6]);
-			pthread_mutex_unlock(&pa->gate[3]);
+		if (condition(i, pa, now))
 			return (NULL);
-		}
 		pthread_mutex_unlock(&pa->gate[3]);
 		++i;
 	}

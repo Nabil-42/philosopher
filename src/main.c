@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/23 14:55:19 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/23 16:44:13 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,8 @@ void	*philosopher_life(void *params)
 
 	index_p_s = 0;
 	pa = (t_para *)params;
-	pthread_mutex_lock(&pa->gate[1]);
-	if (pa->nbr_philo == 1)
-		return (one_philo_life(pa), NULL);
-	pthread_mutex_unlock(&pa->gate[1]);
-	init_thread(pa, &index_p_s);
+	if (init_thread(pa, &index_p_s))
+		return (NULL);
 	while (1)
 	{
 		give_fork(pa, index_p_s);
@@ -59,7 +56,6 @@ void	*philosopher_life(void *params)
 			return (NULL);
 		eating(pa, index_p_s);
 		last_eat(pa, index_p_s);
-		
 		if (check_died_bis(pa, index_p_s))
 			return (NULL);
 		give_back_fork(pa, index_p_s);
@@ -73,9 +69,7 @@ void	*philosopher_life(void *params)
 
 int	initialise(char **argv, t_para *params)
 {
-	if (init(params, argv))
-		return (1);
-	if (init_mutex(params, argv))
+	if (init(params, argv) || init_mutex(params, argv))
 		return (1);
 	params->i = 0;
 	pthread_mutex_lock(&params->gate[7]);
@@ -97,8 +91,7 @@ int	initialise(char **argv, t_para *params)
 	params->i = 0;
 	while (params->i < ft_atoi(argv[1]) + 1)
 		(pthread_join(params->philosophers[params->i], NULL), ++params->i);
-	destroy_mutex(params, params->nbr_philo);
-	free_all(params);
+	(destroy_mutex(params, params->nbr_philo), free_all(params));
 	return (0);
 }
 
