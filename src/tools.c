@@ -6,7 +6,7 @@
 /*   By: nabboud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 16:33:43 by nabil             #+#    #+#             */
-/*   Updated: 2024/07/22 18:34:54 by nabboud          ###   ########.fr       */
+/*   Updated: 2024/07/23 14:50:23 by nabboud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,22 +22,21 @@ long	GT(t_para *pa)
 				* 1000) + (pa->start.tv_usec / 1000)));
 }
 
-void free_all(t_para *params)
+void	free_all(t_para *params)
 {
-    if (params->philosophers)
-        free(params->philosophers);
-    if (params->philo_status)
-        free(params->philo_status);
-    if (params->forks)
-        free(params->forks);
-    if (params->gate)
-        free(params->gate);
-    if (params->fork_status)
-        free(params->fork_status);
+	if (params->philosophers)
+		free(params->philosophers);
+	if (params->philo_status)
+		free(params->philo_status);
+	if (params->forks)
+		free(params->forks);
+	if (params->gate)
+		free(params->gate);
+	if (params->fork_status)
+		free(params->fork_status);
 }
 
-
-void destroy_mutex(t_para *params, int nbr_philo)
+void	destroy_mutex(t_para *params, int nbr_philo)
 {
 	params->i = 0;
 	while (params->i < nbr_philo)
@@ -71,7 +70,7 @@ int	init(t_para *params, char **argv)
 	params->philo_status = malloc(params->nbr_philo * sizeof(t_philo));
 	if (params->philo_status == NULL)
 		return (printf("Error: Malloc philo_status\n"));
-	params->philosophers = malloc((params->nbr_philo + 1)* sizeof(pthread_t));
+	params->philosophers = malloc((params->nbr_philo + 1) * sizeof(pthread_t));
 	if (params->philosophers == NULL)
 		return (printf("Error: Malloc philosophers\n"));
 	params->fork_status = malloc(params->nbr_philo * sizeof(int));
@@ -79,6 +78,7 @@ int	init(t_para *params, char **argv)
 		return (printf("Error: Malloc fork_status\n"));
 	if (argv[5] != NULL)
 		params->must_eat = ft_atoi(argv[5]);
-	else (params->must_eat = 0);
+	else
+		(params->must_eat = 0);
 	return (0);
 }
